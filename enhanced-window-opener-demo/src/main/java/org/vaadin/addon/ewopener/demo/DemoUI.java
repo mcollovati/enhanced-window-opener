@@ -21,6 +21,7 @@ import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Viewport;
 import com.vaadin.server.ClassResource;
+import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -64,12 +65,20 @@ public class DemoUI extends UI {
     @Override
     protected void init(VaadinRequest request) {
 
-        EnhancedBrowserWindowOpener opener1 = new EnhancedBrowserWindowOpener();
+        EnhancedBrowserWindowOpener opener1 = new EnhancedBrowserWindowOpener()
+            .popupBlockerWorkaround(true);
         Button button1 = new Button("Click me");
         button1.addClickListener(e -> {
             opener1.open(generateResource());
         });
         opener1.extend(button1);
+        EnhancedBrowserWindowOpener openerX = new EnhancedBrowserWindowOpener()
+            .popupBlockerWorkaround(true);
+        Button buttonX = new Button("Nothing to open here");
+        buttonX.addClickListener(e -> {
+            openerX.open((Resource)null);
+        });
+        openerX.extend(buttonX);
 
 
         Button button2 = new Button("Click me");
@@ -120,7 +129,7 @@ public class DemoUI extends UI {
             new MLabel("Enhanced Window Opener Demo")
                 .withStyleName(ValoTheme.LABEL_COLORED, ValoTheme.LABEL_H1),
             new MCssLayout(
-                new MVerticalLayout(readMarkdown("code1.md"), button1)
+                new MVerticalLayout(readMarkdown("code1.md"), button1, buttonX)
                     .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined()
                     .withMargin(false),
                 new MVerticalLayout(readMarkdown("code2.md"), button2)
