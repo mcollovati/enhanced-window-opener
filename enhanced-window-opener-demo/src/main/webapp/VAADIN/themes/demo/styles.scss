@@ -1,0 +1,10 @@
+$v-font-size: 14px;
+@import "../valo/valo.scss";
+.demo {
+	@include valo;
+
+    .demo-samples > .v-verticallayout {
+        padding: 10px;
+    }
+
+}

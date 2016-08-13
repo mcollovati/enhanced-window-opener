@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.vaadin.addon</groupId>
+        <artifactId>enhanced-window-opener-root</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
+    <artifactId>enhanced-window-opener-demo</artifactId>
+    <packaging>war</packaging>
+    <name>Enhanced Window Opener Add-on Demo</name>
+
+    <properties>
+        <jetty.plugin.version>9.2.3.v20140905</jetty.plugin.version>
+        <viritin.version>1.55</viritin.version>
+    </properties>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-bom</artifactId>
+                <version>${vaadin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.vaadin.addon</groupId>
+            <artifactId>enhanced-window-opener</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-push</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-client-compiler</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-themes</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.vaadin</groupId>
+            <artifactId>viritin</artifactId>
+            <version>${viritin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.0</version>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.4.1</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <!-- Clean-up widgetset required for "inplace" compilation -->
+                            <directory>${basedir}/src/main/webapp/VAADIN/widgetsets</directory>
+                        </fileset>
+                        <fileset>
+                            <!-- Clean-up gwt cache -->
+                            <directory>${basedir}/src/main/webapp/VAADIN/gwt-unitCache</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <packagingExcludes>
+                        **/VAADIN/gwt-unitCache/**,
+                        **/VAADIN/widgetsets/WEB-INF/**,
+                        **/WEB-INF/classes/gwt-unitCache/**,
+                        **/WEB-INF/classes/themes/**,
+                        **/WEB-INF/classes/widgetsets/**
+                    </packagingExcludes>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-maven-plugin</artifactId>
+                <version>${vaadin.plugin.version}</version>
+                <configuration>
+                    <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+                    <webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets</webappDirectory>
+                    <hostedWebapp>${basedir}/src/main/webapp/VAADIN/widgetsets</hostedWebapp>
+                    <noServer>true</noServer>
+                    <persistentunitcachedir>${basedir}/target/tmp/gwt-unitCache</persistentunitcachedir>
+                    <compileReport>false</compileReport>
+                    <strict>true</strict>
+                    <runTarget>http://localhost:8080/</runTarget>
+                </configuration>
+                <executions>
+                    <!-- You are free to mark this as permanently ignored in Eclipse -->
+                    <execution>
+                        <configuration>
+                            <!-- if you don't specify any modules, the plugin will find them -->
+                        </configuration>
+                        <goals>
+                            <goal>resources</goal>
+                            <goal>update-widgetset</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- The Jetty plugin allows us to easily test the development build by -->
+            <!-- running jetty:run on the command line. -->
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jetty.plugin.version}</version>
+                <configuration>
+                    <stopKey>STOP</stopKey>
+                    <stopPort>9999</stopPort>
+                    <scanIntervalSeconds>2</scanIntervalSeconds>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+</project>
