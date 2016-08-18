@@ -22,4 +22,6 @@ public class EnhancedBrowserWindowOpenerState extends BrowserWindowOpenerState {
     public long lastUpdated = 0;
 
     public boolean clientSide = false;
+
+    public boolean popupBlockerWorkaround = false;
 }

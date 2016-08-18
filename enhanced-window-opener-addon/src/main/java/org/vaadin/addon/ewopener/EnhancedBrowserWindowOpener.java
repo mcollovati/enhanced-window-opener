@@ -153,6 +153,11 @@ public class EnhancedBrowserWindowOpener extends BrowserWindowOpener {
         return this;
     }
 
+    public EnhancedBrowserWindowOpener popupBlockerWorkaround(boolean active) {
+        getState().popupBlockerWorkaround = active;
+        return this;
+    }
+
     /**
      * Sets a {@code resource} for this instance whose content will be generated
      * when the window will be opened.

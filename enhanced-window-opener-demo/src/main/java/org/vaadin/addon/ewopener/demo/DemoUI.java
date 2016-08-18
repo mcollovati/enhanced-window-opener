@@ -21,11 +21,13 @@ import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Viewport;
 import com.vaadin.server.ClassResource;
+import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Link;
@@ -64,12 +66,21 @@ public class DemoUI extends UI {
     @Override
     protected void init(VaadinRequest request) {
 
-        EnhancedBrowserWindowOpener opener1 = new EnhancedBrowserWindowOpener();
+        EnhancedBrowserWindowOpener opener1 = new EnhancedBrowserWindowOpener()
+            .popupBlockerWorkaround(true);
         Button button1 = new Button("Click me");
         button1.addClickListener(e -> {
             opener1.open(generateResource());
         });
         opener1.extend(button1);
+
+        EnhancedBrowserWindowOpener opener4 = new EnhancedBrowserWindowOpener()
+            .popupBlockerWorkaround(true);
+        Button button4 = new Button("Nothing to open here");
+        button4.addClickListener(e -> {
+            opener4.open((Resource)null);
+        });
+        opener4.extend(button4);
 
 
         Button button2 = new Button("Click me");
@@ -80,6 +91,7 @@ public class DemoUI extends UI {
 
         Button button3 = new Button("Click me");
         EnhancedBrowserWindowOpener opener3 = new EnhancedBrowserWindowOpener()
+            .popupBlockerWorkaround(true)
             .withGeneratedContent("myFileName.txt", this::makeStreamSource)
             .doExtend(button3);
         button3.addClickListener(opener3::open);
@@ -100,13 +112,6 @@ public class DemoUI extends UI {
                 })
             .doExtend(link2);
 
-
-        EnhancedBrowserWindowOpener opener4 = new EnhancedBrowserWindowOpener(new ClassResource(DemoUI.class, "static.txt"));
-        Button button4 = new Button("Click me");
-        button4.addClickListener(e -> {
-            opener4.open();
-        });
-        opener4.extend(button4);
 
         EnhancedBrowserWindowOpener opener5 = new EnhancedBrowserWindowOpener(new ClassResource(DemoUI.class, "static.txt"));
         CssLayout hiddenComponent = new MCssLayout().withWidth("0").withHeight("0");
@@ -144,7 +149,7 @@ public class DemoUI extends UI {
 
     private void doSomeLongProcessing() {
         try {
-            Thread.sleep(10000);
+            Thread.sleep(20000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

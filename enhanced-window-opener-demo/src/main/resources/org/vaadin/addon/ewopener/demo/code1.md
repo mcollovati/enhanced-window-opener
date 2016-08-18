@@ -1,12 +1,13 @@
 ## Runtime generated content
 
-Open window with content generated on click. 
+Open window with content generated on click; popup blocker workaround activated. 
 
 ```java
-EnhancedBrowserWindowOpener opener = new EnhancedBrowserWindowOpener();
-Button button1 = new Button("Generated content");
+EnhancedBrowserWindowOpener opener1 = new EnhancedBrowserWindowOpener()
+    .popupBlockerWorkaround(true);
+Button button1 = new Button("Click me");
 button1.addClickListener(e -> {
-    opener.open(generateResource());
+    opener1.open(generateResource());
 });
-opener.extend(button1);
+opener1.extend(button1);
 ```

@@ -1,14 +1,13 @@
-## Serve static content
+## Automatically close window
 
-Open a static resource (in this case is better use BrowserWindowOpener)
+Automatically close popup if there is not content to open.
 
 ```java
-EnhancedBrowserWindowOpener opener3 = new EnhancedBrowserWindowOpener(
-    new ClassResource(DemoUI.class, "static.text")
-);
-Button button3 = new Button("Click me");
-button3.addClickListener(e -> {
-    opener3.open();
+EnhancedBrowserWindowOpener opener4 = new EnhancedBrowserWindowOpener()
+    .popupBlockerWorkaround(true);
+Button button4 = new Button("Nothing to open here");
+button4.addClickListener(e -> {
+    opener4.open((Resource)null);
 });
-opener3.extend(button3);
+opener4.extend(button4);
 ```        

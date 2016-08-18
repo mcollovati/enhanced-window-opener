@@ -1,7 +1,10 @@
 ## Push open
 
-Open a window from server (Please, don't do this to your users :) ).
-You will see a window pop up after 10 seconds.
+Open a window from server (Please, don't try this to at home).
+
+You will see a window pop up 20 seconds after page has loaded;
+ 
+you must be running on localhost or allow popup for this site.
 
 ```java
 EnhancedBrowserWindowOpener opener4 = new EnhancedBrowserWindowOpener(
