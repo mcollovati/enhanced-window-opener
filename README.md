@@ -161,4 +161,4 @@ For a more comprehensive example, see enhanced-window-opener-demo/src/main/java/
 
 ## API
 
-Enhanced Window Opener JavaDoc is available online at <...>
+Enhanced Window Opener JavaDoc is available online at http://vaadindemo-mbf.rhcloud.com/docs/enhanced-window-opener/api/
