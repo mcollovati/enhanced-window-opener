@@ -27,6 +27,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Link;
@@ -72,13 +73,14 @@ public class DemoUI extends UI {
             opener1.open(generateResource());
         });
         opener1.extend(button1);
-        EnhancedBrowserWindowOpener openerX = new EnhancedBrowserWindowOpener()
+
+        EnhancedBrowserWindowOpener opener4 = new EnhancedBrowserWindowOpener()
             .popupBlockerWorkaround(true);
-        Button buttonX = new Button("Nothing to open here");
-        buttonX.addClickListener(e -> {
-            openerX.open((Resource)null);
+        Button button4 = new Button("Nothing to open here");
+        button4.addClickListener(e -> {
+            opener4.open((Resource)null);
         });
-        openerX.extend(buttonX);
+        opener4.extend(button4);
 
 
         Button button2 = new Button("Click me");
@@ -89,6 +91,7 @@ public class DemoUI extends UI {
 
         Button button3 = new Button("Click me");
         EnhancedBrowserWindowOpener opener3 = new EnhancedBrowserWindowOpener()
+            .popupBlockerWorkaround(true)
             .withGeneratedContent("myFileName.txt", this::makeStreamSource)
             .doExtend(button3);
         button3.addClickListener(opener3::open);
@@ -110,13 +113,6 @@ public class DemoUI extends UI {
             .doExtend(link2);
 
 
-        EnhancedBrowserWindowOpener opener4 = new EnhancedBrowserWindowOpener(new ClassResource(DemoUI.class, "static.txt"));
-        Button button4 = new Button("Click me");
-        button4.addClickListener(e -> {
-            opener4.open();
-        });
-        opener4.extend(button4);
-
         EnhancedBrowserWindowOpener opener5 = new EnhancedBrowserWindowOpener(new ClassResource(DemoUI.class, "static.txt"));
         CssLayout hiddenComponent = new MCssLayout().withWidth("0").withHeight("0");
         opener5.extend(hiddenComponent);
@@ -129,7 +125,7 @@ public class DemoUI extends UI {
             new MLabel("Enhanced Window Opener Demo")
                 .withStyleName(ValoTheme.LABEL_COLORED, ValoTheme.LABEL_H1),
             new MCssLayout(
-                new MVerticalLayout(readMarkdown("code1.md"), button1, buttonX)
+                new MVerticalLayout(readMarkdown("code1.md"), button1)
                     .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined()
                     .withMargin(false),
                 new MVerticalLayout(readMarkdown("code2.md"), button2)
@@ -153,7 +149,7 @@ public class DemoUI extends UI {
 
     private void doSomeLongProcessing() {
         try {
-            Thread.sleep(10000);
+            Thread.sleep(20000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
