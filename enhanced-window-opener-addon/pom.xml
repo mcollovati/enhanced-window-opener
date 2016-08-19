@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.vaadin.addon</groupId>
         <artifactId>enhanced-window-opener-root</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>0.1-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
     <artifactId>enhanced-window-opener</artifactId>
@@ -112,6 +112,26 @@
                             <goal>single</goal>
                         </goals>
                         <phase>install</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.igormaznitsa</groupId>
+                <artifactId>uber-pom</artifactId>
+                <version>1.0.1</version>
+                <configuration>
+                    <remove>
+                        <section>parent</section>
+                        <section>modules</section>
+                        <section>profiles/profile/modules</section>
+                    </remove>
+                    <removeSiblingDuplications>true</removeSiblingDuplications>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>upom</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
