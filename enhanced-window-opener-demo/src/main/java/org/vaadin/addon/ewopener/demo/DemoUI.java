@@ -20,31 +20,37 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Viewport;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.shared.ui.MultiSelectMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Link;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 import org.jsoup.safety.Whitelist;
 import org.vaadin.addon.ewopener.EnhancedBrowserWindowOpener;
+import org.vaadin.viritin.fields.MTable;
 import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.label.RichText;
 import org.vaadin.viritin.layouts.MCssLayout;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import javax.servlet.annotation.WebServlet;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -62,6 +68,7 @@ public class DemoUI extends UI {
     }
 
     private final AtomicInteger downloadCounter = new AtomicInteger(0);
+    private Table table;
 
     @Override
     protected void init(VaadinRequest request) {
@@ -78,7 +85,7 @@ public class DemoUI extends UI {
             .popupBlockerWorkaround(true);
         Button button4 = new Button("Nothing to open here");
         button4.addClickListener(e -> {
-            opener4.open((Resource)null);
+            opener4.open((Resource) null);
         });
         opener4.extend(button4);
 
@@ -92,20 +99,20 @@ public class DemoUI extends UI {
         Button button3 = new Button("Click me");
         EnhancedBrowserWindowOpener opener3 = new EnhancedBrowserWindowOpener()
             .popupBlockerWorkaround(true)
-            .withGeneratedContent("myFileName.txt", this::makeStreamSource)
+            .withGeneratedContent("myFileName.txt", this::generateContent)
             .doExtend(button3);
         button3.addClickListener(opener3::open);
 
         Link link = new Link("Click me", null);
         new EnhancedBrowserWindowOpener()
             .clientSide(true)
-            .withGeneratedContent("myFileName.txt", this::makeStreamSource)
+            .withGeneratedContent("myFileName.txt", this::generateContent)
             .doExtend(link);
 
         Link link2 = new Link("Click me", null);
         new EnhancedBrowserWindowOpener()
             .clientSide(true)
-            .withGeneratedContent("myFileName.txt", this::makeStreamSource,
+            .withGeneratedContent("myFileName.txt", this::generateContent,
                 resource -> {
                     resource.setCacheTime(0);
                     resource.setFilename("runtimeFileName-" + Instant.now().getEpochSecond() + ".txt");
@@ -119,28 +126,40 @@ public class DemoUI extends UI {
         CompletableFuture.runAsync(this::doSomeLongProcessing)
             .thenRun(() -> getUI().access(opener5::open));
 
+        table = new Table("Select items to download", new BeanItemContainer<>(DummyService.Person.class, DummyService.data()));
+        table.setImmediate(true);
+        table.setVisibleColumns("name", "age");
+        table.setColumnHeaders("Name", "Age");
+        table.setWidth("100%");
+        table.setPageLength(20);
+        table.setMultiSelectMode(MultiSelectMode.DEFAULT);
+        table.setMultiSelect(true);
+        table.setSelectable(true);
+
 
         // Show it in the middle of the screen
         final Layout layout = new MVerticalLayout(
             new MLabel("Enhanced Window Opener Demo")
                 .withStyleName(ValoTheme.LABEL_COLORED, ValoTheme.LABEL_H1),
-            new MCssLayout(
-                new MVerticalLayout(readMarkdown("code1.md"), button1)
-                    .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined()
-                    .withMargin(false),
-                new MVerticalLayout(readMarkdown("code2.md"), button2)
-                    .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
-                new MVerticalLayout(readMarkdown("code7.md"), button3)
-                    .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
-                new MVerticalLayout(readMarkdown("code5.md"), link)
-                    .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
-                new MVerticalLayout(readMarkdown("code6.md"), link2)
-                    .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
-                new MVerticalLayout(readMarkdown("code3.md"), button4)
-                    .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
-                new MVerticalLayout(readMarkdown("code4.md"), hiddenComponent)
-                    .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false)
-            ).withFullWidth().withStyleName("demo-samples")
+            new MHorizontalLayout().add(table, 1).add(
+                new MCssLayout(
+                    new MVerticalLayout(readMarkdown("code1.md"), button1)
+                        .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined()
+                        .withMargin(false),
+                    new MVerticalLayout(readMarkdown("code2.md"), button2)
+                        .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
+                    new MVerticalLayout(readMarkdown("code7.md"), button3)
+                        .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
+                    new MVerticalLayout(readMarkdown("code5.md"), link)
+                        .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
+                    new MVerticalLayout(readMarkdown("code6.md"), link2)
+                        .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
+                    new MVerticalLayout(readMarkdown("code3.md"), button4)
+                        .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
+                    new MVerticalLayout(readMarkdown("code4.md"), hiddenComponent)
+                        .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false)
+                ).withFullWidth().withStyleName("demo-samples")
+                , 5).withFullWidth()
         ).withFullWidth().withMargin(true);
 
         setContent(layout);
@@ -162,12 +181,20 @@ public class DemoUI extends UI {
         return streamResource;
     }
 
+    @SuppressWarnings("unchecked")
+    private InputStream generateContent() {
+        StringBuilder content = new StringBuilder()
+            .append(String.format("File %d downloaded at %s", downloadCounter.incrementAndGet(),
+            DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now())));
+        Collection<DummyService.Person> data = (Collection<DummyService.Person>)table.getValue();
+        data.stream().map(DummyService.Person::toString)
+            .peek(s -> content.append(System.lineSeparator()))
+            .forEach(content::append);
+        return new ByteArrayInputStream(content.toString().getBytes());
+    }
+
     private StreamResource.StreamSource makeStreamSource() {
-        return () -> {
-            String content = String.format("File %d downloaded at %s", downloadCounter.incrementAndGet(),
-                DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now()));
-            return new ByteArrayInputStream(content.getBytes());
-        };
+        return this::generateContent;
     }
 
     private static RichText readMarkdown(String markdown) {

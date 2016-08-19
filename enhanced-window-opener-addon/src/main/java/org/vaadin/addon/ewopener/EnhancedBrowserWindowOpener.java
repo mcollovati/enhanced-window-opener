@@ -162,14 +162,15 @@ public class EnhancedBrowserWindowOpener extends BrowserWindowOpener {
      * Sets a {@code resource} for this instance whose content will be generated
      * when the window will be opened.
      *
-     * The content will be generated through {@code generator} instance.
+     * The content will be generated through {@code generator} instance and the cache will be disabled.
      *
      * @param filename  The filename for the generated resource.
      * @param generator The content generator.
      * @return current object for further customization
      */
-    public EnhancedBrowserWindowOpener withGeneratedContent(String filename, DynamicContentGenerator generator) {
+    public EnhancedBrowserWindowOpener withGeneratedContent(String filename, StreamResource.StreamSource generator) {
         return withGeneratedContent(filename, generator, r -> {
+            r.setCacheTime(0);
         });
     }
 
@@ -185,14 +186,14 @@ public class EnhancedBrowserWindowOpener extends BrowserWindowOpener {
      * @param resourceCustomizer The {@link StreamResource} customizer
      * @return current object for further customization
      */
-    public EnhancedBrowserWindowOpener withGeneratedContent(String filename, DynamicContentGenerator generator,
+    public EnhancedBrowserWindowOpener withGeneratedContent(String filename, StreamResource.StreamSource generator,
                                                             StreamResourceCustomizer resourceCustomizer) {
         Objects.requireNonNull(generator);
         Objects.requireNonNull(resourceCustomizer);
         StreamResource resource = new StreamResource(null, filename) {
             @Override
-            public StreamSource getStreamSource() {
-                return generator.streamSource();
+            public StreamResource.StreamSource getStreamSource() {
+                return generator::getStream;
             }
         };
         resourceCustomizer.customize(resource);
