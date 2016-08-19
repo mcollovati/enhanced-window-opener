@@ -37,7 +37,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 import org.jsoup.safety.Whitelist;
 import org.vaadin.addon.ewopener.EnhancedBrowserWindowOpener;
-import org.vaadin.viritin.fields.MTable;
 import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.label.RichText;
 import org.vaadin.viritin.layouts.MCssLayout;
