@@ -25,6 +25,9 @@
     
 
     <inherits name="com.vaadin.DefaultWidgetSet" />
+    
 
     <inherits name="org.vaadin.addon.ewopener.WidgetSet" />
+
+    <inherits name="com.vaadin.v7.Vaadin7WidgetSet" />
 </module>
