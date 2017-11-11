@@ -4,7 +4,7 @@
     <groupId>org.vaadin.addon</groupId>
     <artifactId>enhanced-window-opener-root</artifactId>
     <packaging>pom</packaging>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.1.1-SNAPSHOT</version>
     <name>Enhanced Window Opener Add-on Root Project</name>
 
     <prerequisites>

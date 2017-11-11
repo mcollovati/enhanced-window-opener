@@ -15,18 +15,23 @@
  */
 package org.vaadin.addon.ewopener.client;
 
+import java.util.Map;
+
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.URL;
+import com.vaadin.client.ServerConnector;
+import com.vaadin.client.VConsole;
 import com.vaadin.client.annotations.OnStateChange;
 import com.vaadin.client.extensions.BrowserWindowOpenerConnector;
+import com.vaadin.client.ui.VMenuBar;
+import com.vaadin.client.ui.menubar.MenuBarConnector;
 import com.vaadin.shared.ui.BrowserWindowOpenerState;
 import com.vaadin.shared.ui.Connect;
 import com.vaadin.shared.util.SharedUtil;
 import org.vaadin.addon.ewopener.EnhancedBrowserWindowOpener;
 import org.vaadin.addon.ewopener.shared.EnhancedBrowserWindowOpenerState;
-
-import java.util.Map;
 
 /**
  * Client side code for {@link EnhancedBrowserWindowOpener}.
@@ -35,12 +40,14 @@ import java.util.Map;
 public class EnhancedBrowserWindowOpenerConnector extends BrowserWindowOpenerConnector {
 
     private JavaScriptObject window;
+    private HandlerRegistration menuClickHandlerReg;
+
 
     @Override
     public void onClick(ClickEvent event) {
         if (getState().clientSide) {
             super.onClick(event);
-        } else if (getState().popupBlockerWorkaround){
+        } else if (getState().popupBlockerWorkaround) {
             window = openWindow(getState().target, getState().features);
         }
     }
@@ -49,20 +56,42 @@ public class EnhancedBrowserWindowOpenerConnector extends BrowserWindowOpenerCon
     public void onUnregister() {
         window = null;
         super.onUnregister();
+        if (menuClickHandlerReg != null) {
+            menuClickHandlerReg.removeHandler();
+        }
+
+
     }
 
-    private static native JavaScriptObject openWindow(String name, String features) /*-{
-    return $wnd.open(undefined, name, features);
-  }-*/;
+    @Override
+    public EnhancedBrowserWindowOpenerState getState() {
+        return (EnhancedBrowserWindowOpenerState) super.getState();
+    }
 
-    private static native void setWindowUrl(JavaScriptObject window, String url) /*-{
-    window.location.href = url;
-  }-*/;
+    @Override
+    protected void extend(ServerConnector target) {
+        if (target instanceof MenuBarConnector) {
+            extendMenu((MenuBarConnector) target);
+        } else {
+            super.extend(target);
+        }
+    }
 
-    private static native void closeWindow(JavaScriptObject window) /*-{
-    window.close();
-  }-*/;
 
+    private void extendMenu(MenuBarConnector target) {
+        VMenuBar widget = target.getWidget();
+
+        menuClickHandlerReg = widget.addHandler(new ServerSideIdAwareMenuItem.MenuItemSelectionHandler() {
+            @Override
+            public void onMenuItemSelected(ServerSideIdAwareMenuItem.MenuItemSelectedEvent event) {
+                VConsole.log("======================= menu clicked " + EnhancedBrowserWindowOpenerConnector.this.getState().menuItem + " item is "
+                    + event.getMenuItem().getServerSideId());
+                if (event.getMenuItem().getServerSideId() == EnhancedBrowserWindowOpenerConnector.this.getState().menuItem) {
+                    EnhancedBrowserWindowOpenerConnector.this.onClick(null);
+                }
+            }
+        }, ServerSideIdAwareMenuItem.MenuItemSelectedEvent.getType());
+    }
 
     @OnStateChange("lastUpdated")
     private void onLastUpdateChanged() {
@@ -81,11 +110,6 @@ public class EnhancedBrowserWindowOpenerConnector extends BrowserWindowOpenerCon
             }
 
         }
-    }
-
-    @Override
-    public EnhancedBrowserWindowOpenerState getState() {
-        return (EnhancedBrowserWindowOpenerState) super.getState();
     }
 
     private String addParametersAndFragment(String url) {
@@ -119,4 +143,24 @@ public class EnhancedBrowserWindowOpenerConnector extends BrowserWindowOpenerCon
         return url;
     }
 
+    private static native JavaScriptObject openWindow(String name, String features) /*-{
+    return $wnd.open(undefined, name, features);
+  }-*/;
+
+    private static native void setWindowUrl(JavaScriptObject window, String url) /*-{
+    window.location.href = url;
+  }-*/;
+
+    private static native void closeWindow(JavaScriptObject window) /*-{
+    window.close();
+  }-*/;
+
+    private static native void wrapMenu(VMenuBar hostReference) /*-{
+    console.log("======================================== OK", hostReference);
+    var clickFn = hostReference.onMenuClick;
+    hostReference.onMenuClick = function(itemId) {
+        console.log("My Fn invoked", itemId);
+        clickFn.apply(this, arguments);
+    }
+  }-*/;
 }

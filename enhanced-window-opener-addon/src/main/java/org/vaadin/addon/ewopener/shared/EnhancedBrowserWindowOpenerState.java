@@ -24,4 +24,6 @@ public class EnhancedBrowserWindowOpenerState extends BrowserWindowOpenerState {
     public boolean clientSide = false;
 
     public boolean popupBlockerWorkaround = false;
+
+    public int menuItem = 0;
 }
