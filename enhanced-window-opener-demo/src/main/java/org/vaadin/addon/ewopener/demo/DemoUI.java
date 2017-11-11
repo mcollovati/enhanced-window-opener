@@ -15,35 +15,6 @@
  */
 package org.vaadin.addon.ewopener.demo;
 
-import com.vaadin.annotations.Push;
-import com.vaadin.annotations.Theme;
-import com.vaadin.annotations.Title;
-import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.annotations.Viewport;
-import com.vaadin.v7.data.util.BeanItemContainer;
-import com.vaadin.server.ClassResource;
-import com.vaadin.server.Resource;
-import com.vaadin.server.StreamResource;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinServlet;
-import com.vaadin.shared.ui.MultiSelectMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Layout;
-import com.vaadin.ui.Link;
-import com.vaadin.v7.ui.Table;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.themes.ValoTheme;
-import org.jsoup.safety.Whitelist;
-import org.vaadin.addon.ewopener.EnhancedBrowserWindowOpener;
-import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.label.RichText;
-import org.vaadin.viritin.layouts.MCssLayout;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MVerticalLayout;
-
-import javax.servlet.annotation.WebServlet;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.Instant;
@@ -53,6 +24,40 @@ import java.util.Collection;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.servlet.annotation.WebServlet;
+
+import com.vaadin.annotations.Push;
+import com.vaadin.annotations.Theme;
+import com.vaadin.annotations.Title;
+import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.annotations.Viewport;
+import com.vaadin.server.ClassResource;
+import com.vaadin.server.Resource;
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinServlet;
+import com.vaadin.shared.Registration;
+import com.vaadin.shared.ui.MultiSelectMode;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Layout;
+import com.vaadin.ui.Link;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.ui.Table;
+import org.jsoup.safety.Whitelist;
+import org.vaadin.addon.ewopener.EnhancedBrowserWindowOpener;
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.label.RichText;
+import org.vaadin.viritin.layouts.MCssLayout;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 @Theme("demo")
 @Title("Enhanced Window Opener Demo")
@@ -136,6 +141,18 @@ public class DemoUI extends UI {
         table.setSelectable(true);
 
 
+        final MyPopupContent popupContent = new MyPopupContent();
+        Button popupButton = new Button("Open modal", event -> {
+            Window window = new Window("Test", popupContent);
+            window.setWidth(40, Sizeable.Unit.PERCENTAGE);
+            window.setHeight(200, Sizeable.Unit.PIXELS);
+            window.setModal(true);
+            window.setDraggable(false);
+            window.setResizable(false);
+            window.center();
+            getUI().addWindow(window);
+        });
+
         // Show it in the middle of the screen
         final Layout layout = new MVerticalLayout(
             new MLabel("Enhanced Window Opener Demo")
@@ -154,6 +171,8 @@ public class DemoUI extends UI {
                     new MVerticalLayout(readMarkdown("code6.md"), link2)
                         .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
                     new MVerticalLayout(readMarkdown("code3.md"), button4)
+                        .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
+                    new MVerticalLayout(readMarkdown("code8.md"), popupButton)
                         .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
                     new MVerticalLayout(readMarkdown("code4.md"), hiddenComponent)
                         .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false)
@@ -184,8 +203,8 @@ public class DemoUI extends UI {
     private InputStream generateContent() {
         StringBuilder content = new StringBuilder()
             .append(String.format("File %d downloaded at %s", downloadCounter.incrementAndGet(),
-            DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now())));
-        Collection<DummyService.Person> data = (Collection<DummyService.Person>)table.getValue();
+                DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now())));
+        Collection<DummyService.Person> data = (Collection<DummyService.Person>) table.getValue();
         data.stream().map(DummyService.Person::toString)
             .peek(s -> content.append(System.lineSeparator()))
             .forEach(content::append);
@@ -206,4 +225,44 @@ public class DemoUI extends UI {
         }
     }
 
+}
+
+class MyPopupContent extends MVerticalLayout {
+
+    MButton button = new MButton("Open window");
+    Registration openerClickRegistration;
+    Button.ClickListener clickListener;
+
+    public MyPopupContent() {
+        add(new MLabel("Open from popup")
+                .withStyleName(ValoTheme.LABEL_COLORED, ValoTheme.LABEL_H1),
+            button
+        );
+    }
+
+    @Override
+    public void attach() {
+        super.attach();
+        EnhancedBrowserWindowOpener opener = EnhancedBrowserWindowOpener.extendOnce(button);
+        clickListener = e2 -> opener.open(streamContent());
+        button.addClickListener(clickListener);
+        //openerClickRegistration = button.addClickListener(e2 -> opener.open(streamContent()));
+    }
+
+    @Override
+    public void detach() {
+        EnhancedBrowserWindowOpener.extendOnce(button).remove();
+        button.removeClickListener(clickListener);
+        //openerClickRegistration.remove();
+        super.detach();
+    }
+
+    private StreamResource streamContent() {
+        StreamResource streamResource = new StreamResource(
+            () -> new ByteArrayInputStream(LocalDateTime.now().toString().getBytes()), "simpleTextFile.txt"
+        );
+        streamResource.setCacheTime(0); // do not cache
+        streamResource.setMIMEType("text/plain");
+        return streamResource;
+    }
 }
