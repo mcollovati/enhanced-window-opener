@@ -12,8 +12,8 @@
     <name>Enhanced Window Opener Add-on Demo</name>
 
     <properties>
-        <jetty.plugin.version>9.2.3.v20140905</jetty.plugin.version>
-        <viritin.version>2.0.alpha1</viritin.version>
+        <jetty.plugin.version>9.3.10.M0</jetty.plugin.version>
+        <viritin.version>2.0</viritin.version>
     </properties>
 
 
@@ -71,12 +71,12 @@
         <dependency>
             <groupId>com.oblac</groupId>
             <artifactId>nomen-est-omen</artifactId>
-            <version>1.2</version>
+            <version>1.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.8</version>
+            <version>1.16.18</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
