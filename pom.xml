@@ -4,7 +4,7 @@
     <groupId>org.vaadin.addon</groupId>
     <artifactId>enhanced-window-opener-root</artifactId>
     <packaging>pom</packaging>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.3</version>
     <name>Enhanced Window Opener Add-on Root Project</name>
 
     <prerequisites>
@@ -27,7 +27,7 @@
         <url>https://github.com/mcollovati/enhanced-window-opener.git</url>
         <connection>scm:git:git@github.com:mcollovati/enhanced-window-opener.git</connection>
         <developerConnection>scm:git:ssh://git@github.com:/mcollovati/enhanced-window-opener.git</developerConnection>
-        <tag>v0.1</tag>
+        <tag>v0.3</tag>
     </scm>
     <developers>
         <developer>
