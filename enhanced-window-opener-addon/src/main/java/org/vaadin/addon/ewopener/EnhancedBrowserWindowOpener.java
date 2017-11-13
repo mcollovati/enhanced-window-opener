@@ -15,17 +15,18 @@
  */
 package org.vaadin.addon.ewopener;
 
+import java.time.Instant;
+import java.util.Objects;
+
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.UI;
 import org.vaadin.addon.ewopener.shared.EnhancedBrowserWindowOpenerState;
-
-import java.time.Instant;
-import java.util.Objects;
 
 /**
  * Extension of {@link BrowserWindowOpener} that simplifies open windows for
@@ -74,22 +75,6 @@ public class EnhancedBrowserWindowOpener extends BrowserWindowOpener {
         super((Resource) null);
     }
 
-
-    /**
-     * Extends the target component or return an already attached extension instance.
-     *
-     * @param target The component to extend
-     * @return The extension instance
-     */
-    public static EnhancedBrowserWindowOpener extendOnce(AbstractComponent target) {
-        return Objects.requireNonNull(target).getExtensions().stream()
-            .filter(EnhancedBrowserWindowOpener.class::isInstance)
-            .findFirst()
-            .map(EnhancedBrowserWindowOpener.class::cast)
-            .orElseGet(() -> new EnhancedBrowserWindowOpener().doExtend(target));
-    }
-
-
     /**
      * Forces the client to open a window for the given resource when the current request completes.
      *
@@ -126,9 +111,9 @@ public class EnhancedBrowserWindowOpener extends BrowserWindowOpener {
      * Simple method to attach the extension as listener for components.
      *
      * {@code
-     *  opener = new EnhancedBrowserWindowOpener();
-     *  ...
-     *  button.addClickListener(opener::open);
+     * opener = new EnhancedBrowserWindowOpener();
+     * ...
+     * button.addClickListener(opener::open);
      * }
      *
      * @param event event
@@ -137,7 +122,6 @@ public class EnhancedBrowserWindowOpener extends BrowserWindowOpener {
     public final EnhancedBrowserWindowOpener open(Component.Event event) {
         return open();
     }
-
 
     /**
      * Set if the extension should work as client side listener.
@@ -201,9 +185,6 @@ public class EnhancedBrowserWindowOpener extends BrowserWindowOpener {
         return this;
     }
 
-
-    // Fluent sugar
-
     /**
      * Extends the given connector.
      *
@@ -212,6 +193,22 @@ public class EnhancedBrowserWindowOpener extends BrowserWindowOpener {
      */
     public EnhancedBrowserWindowOpener doExtend(AbstractClientConnector target) {
         this.extend(target);
+        return this;
+    }
+
+
+    // Fluent sugar
+
+    /**
+     * Extends a {@link MenuBar} allowing to open a window from a {@link com.vaadin.ui.MenuBar.MenuItem}.
+     *
+     * @param menuBar  The menu bar to extend
+     * @param menuItem The menu item that should trigger the open operation
+     * @return current object for further customization
+     */
+    public EnhancedBrowserWindowOpener doExtend(MenuBar menuBar, MenuBar.MenuItem menuItem) {
+        this.extend(menuBar);
+        getState().menuItem = menuItem.getId();
         return this;
     }
 
@@ -274,6 +271,20 @@ public class EnhancedBrowserWindowOpener extends BrowserWindowOpener {
     @Override
     protected EnhancedBrowserWindowOpenerState getState(boolean markAsDirty) {
         return (EnhancedBrowserWindowOpenerState) super.getState(markAsDirty);
+    }
+
+    /**
+     * Extends the target component or return an already attached extension instance.
+     *
+     * @param target The component to extend
+     * @return The extension instance
+     */
+    public static EnhancedBrowserWindowOpener extendOnce(AbstractComponent target) {
+        return Objects.requireNonNull(target).getExtensions().stream()
+            .filter(EnhancedBrowserWindowOpener.class::isInstance)
+            .findFirst()
+            .map(EnhancedBrowserWindowOpener.class::cast)
+            .orElseGet(() -> new EnhancedBrowserWindowOpener().doExtend(target));
     }
 
 

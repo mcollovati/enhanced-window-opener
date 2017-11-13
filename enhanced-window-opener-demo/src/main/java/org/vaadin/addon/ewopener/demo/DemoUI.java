@@ -15,6 +15,7 @@
  */
 package org.vaadin.addon.ewopener.demo;
 
+import javax.servlet.annotation.WebServlet;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.Instant;
@@ -24,7 +25,6 @@ import java.util.Collection;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.servlet.annotation.WebServlet;
 
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
@@ -42,9 +42,10 @@ import com.vaadin.shared.ui.MultiSelectMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Link;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
@@ -65,11 +66,6 @@ import org.vaadin.viritin.layouts.MVerticalLayout;
 @Push
 @SuppressWarnings("serial")
 public class DemoUI extends UI {
-
-    @WebServlet(value = "/*", asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = DemoUI.class, widgetset = "org.vaadin.addon.ewopener.demo.DemoWidgetSet")
-    public static class Servlet extends VaadinServlet {
-    }
 
     private final AtomicInteger downloadCounter = new AtomicInteger(0);
     private Table table;
@@ -153,12 +149,40 @@ public class DemoUI extends UI {
             getUI().addWindow(window);
         });
 
+        MenuBar.Command cmd = selectedItem -> Notification.show(
+            "Item clicked", "Item is " + selectedItem.getDescription(), Notification.Type.TRAY_NOTIFICATION
+        );
+        MenuBar menuBar = new MenuBar();
+        menuBar.setSizeFull();
+        EnhancedBrowserWindowOpener opener6 = new EnhancedBrowserWindowOpener()
+            .withGeneratedContent("menu-item-serverside.txt", this::generateContent)
+            .popupBlockerWorkaround(true);
+        EnhancedBrowserWindowOpener opener7 = new EnhancedBrowserWindowOpener()
+            .withGeneratedContent("menu-item-clientside-1.txt", this::generateContent)
+            .clientSide(true);
+        EnhancedBrowserWindowOpener opener8 = new EnhancedBrowserWindowOpener()
+            .withGeneratedContent("menu-item-clientside-2.txt", this::generateContent)
+            .clientSide(true);
+        MenuBar.MenuItem menuItem = menuBar.addItem("Download from Menu (Client side)", selectedItem -> {
+            System.out.println("OK, Invoked");
+        });
+        MenuBar.MenuItem subMenu = menuBar.addItem("Sub menu", null);
+        subMenu.addItem("Item 1", cmd);
+        subMenu.addItem("Item 2", cmd);
+        MenuBar.MenuItem subItem = subMenu.addItem("Download (client side)", cmd);
+        MenuBar.MenuItem subItem2 = subMenu.addItem("Download (server side)", selectedItem -> opener6.open());
+        opener7.doExtend(menuBar, menuItem);
+        opener6.doExtend(menuBar, subItem2);
+        opener8.doExtend(menuBar, subItem);
+
+
         // Show it in the middle of the screen
         final Layout layout = new MVerticalLayout(
             new MLabel("Enhanced Window Opener Demo")
                 .withStyleName(ValoTheme.LABEL_COLORED, ValoTheme.LABEL_H1),
             new MHorizontalLayout().add(table, 1).add(
                 new MCssLayout(
+                    menuBar, readMarkdown("code_menu.md").withFullWidth(),
                     new MVerticalLayout(readMarkdown("code1.md"), button1)
                         .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined()
                         .withMargin(false),
@@ -223,6 +247,11 @@ public class DemoUI extends UI {
             HighlightJS.of(rt);
             return rt;
         }
+    }
+
+    @WebServlet(value = "/*", asyncSupported = true)
+    @VaadinServletConfiguration(productionMode = false, ui = DemoUI.class, widgetset = "org.vaadin.addon.ewopener.demo.DemoWidgetSet")
+    public static class Servlet extends VaadinServlet {
     }
 
 }
