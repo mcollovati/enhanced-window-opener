@@ -161,4 +161,4 @@ For a more comprehensive example, see enhanced-window-opener-demo/src/main/java/
 
 ## API
 
-Enhanced Window Opener JavaDoc is available online at http://https://mbf-vaadin.herokuapp.com/docs/enhanced-window-opener/api/
+Enhanced Window Opener JavaDoc is available online at https://mbf-vaadindemo.herokuapp.com/docs/enhanced-window-opener/api/
