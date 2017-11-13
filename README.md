@@ -71,7 +71,7 @@ The aims of this addon are the following:
 Opening the window as a result of click listener will not play well wit browsers popup blockers.
 The browser will block all `window.open(...)` calls that are not directly triggered by a human interaction; 
 if the window is opened on a client side click listener there is no problem but if it is done as a result of 
-some asyn computation (for example an AJAX call) the popup will be blocked.
+some async computation (for example an AJAX call) the popup will be blocked.
 The addon can be configured to workaround this problem opening a blank window on client click listener
 and setting the location after a server side state change has been triggered.
 
@@ -80,7 +80,7 @@ Enhanced Window Opener requires a widgetset ricompilation in order to be used in
 
 ## Online demo
 
-Try the add-on demo at http://vaadindemo-mbf.rhcloud.com/enhanced-window-opener/
+Try the add-on demo at https://mbf-vaadin-ewo.herokuapp.com/
 
 ## Download release
 
@@ -161,4 +161,4 @@ For a more comprehensive example, see enhanced-window-opener-demo/src/main/java/
 
 ## API
 
-Enhanced Window Opener JavaDoc is available online at http://vaadindemo-mbf.rhcloud.com/docs/enhanced-window-opener/api/
+Enhanced Window Opener JavaDoc is available online at http://https://mbf-vaadin.herokuapp.com/docs/enhanced-window-opener/api/
