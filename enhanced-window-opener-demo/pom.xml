@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.vaadin.addon</groupId>
         <artifactId>enhanced-window-opener-root</artifactId>
-        <version>0.4</version>
+        <version>0.5-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
     <artifactId>enhanced-window-opener-demo</artifactId>
