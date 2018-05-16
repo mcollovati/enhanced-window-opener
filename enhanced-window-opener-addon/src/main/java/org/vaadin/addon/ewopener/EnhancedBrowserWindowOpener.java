@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.server.BrowserWindowOpener;
+import com.vaadin.server.EventTrigger;
 import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.ui.AbstractComponent;
@@ -196,6 +197,18 @@ public class EnhancedBrowserWindowOpener extends BrowserWindowOpener {
         return this;
     }
 
+    /**
+     * Add this extension to the {@code EventTrigger}.
+     *
+     * @param eventTrigger the trigger to attach this extension to
+     * @return current object for further customization
+     *
+     * @since 0.4
+     */
+    public EnhancedBrowserWindowOpener doExtend(EventTrigger eventTrigger) {
+        this.extend(eventTrigger);
+        return this;
+    }
 
     // Fluent sugar
 
@@ -205,10 +218,11 @@ public class EnhancedBrowserWindowOpener extends BrowserWindowOpener {
      * @param menuBar  The menu bar to extend
      * @param menuItem The menu item that should trigger the open operation
      * @return current object for further customization
+     * @deprecated since 0.4; from Vaadin 8.4 {@link com.vaadin.ui.MenuBar.MenuItem} could be extended directly
      */
+    @Deprecated
     public EnhancedBrowserWindowOpener doExtend(MenuBar menuBar, MenuBar.MenuItem menuItem) {
-        this.extend(menuBar);
-        getState().menuItem = menuItem.getId();
+        this.extend(menuItem);
         return this;
     }
 

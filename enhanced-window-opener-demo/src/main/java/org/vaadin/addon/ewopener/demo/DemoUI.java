@@ -274,15 +274,13 @@ class MyPopupContent extends MVerticalLayout {
         super.attach();
         EnhancedBrowserWindowOpener opener = EnhancedBrowserWindowOpener.extendOnce(button);
         clickListener = e2 -> opener.open(streamContent());
-        button.addClickListener(clickListener);
-        //openerClickRegistration = button.addClickListener(e2 -> opener.open(streamContent()));
+        openerClickRegistration = button.addClickListener(e2 -> opener.open(streamContent()));
     }
 
     @Override
     public void detach() {
         EnhancedBrowserWindowOpener.extendOnce(button).remove();
-        button.removeClickListener(clickListener);
-        //openerClickRegistration.remove();
+        openerClickRegistration.remove();
         super.detach();
     }
 
