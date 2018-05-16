@@ -25,5 +25,4 @@ public class EnhancedBrowserWindowOpenerState extends BrowserWindowOpenerState {
 
     public boolean popupBlockerWorkaround = false;
 
-    public int menuItem = 0;
 }

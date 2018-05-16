@@ -77,6 +77,15 @@ and setting the location after a server side state change has been triggered.
 
 Enhanced Window Opener requires a widgetset ricompilation in order to be used in a Vaadin project; Java 8 is also required.
 
+## Compatibility Matrix
+
+| Enhanced Window Opener Version | Vaadin Version |
+| ------------------------------ | -------------- |
+| 0.4| 8.4 |
+| 0.3| [ 8.0.x, 8.3.x ] |
+| 0.2| [ 8.0.x, 8.3.x ] |
+| 0.1| 7.x |
+
 
 ## Online demo
 

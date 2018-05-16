@@ -18,15 +18,10 @@ package org.vaadin.addon.ewopener.client;
 import java.util.Map;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.URL;
-import com.vaadin.client.ServerConnector;
-import com.vaadin.client.VConsole;
 import com.vaadin.client.annotations.OnStateChange;
 import com.vaadin.client.extensions.BrowserWindowOpenerConnector;
 import com.vaadin.client.ui.VMenuBar;
-import com.vaadin.client.ui.menubar.MenuBarConnector;
 import com.vaadin.shared.ui.BrowserWindowOpenerState;
 import com.vaadin.shared.ui.Connect;
 import com.vaadin.shared.util.SharedUtil;
@@ -40,13 +35,12 @@ import org.vaadin.addon.ewopener.shared.EnhancedBrowserWindowOpenerState;
 public class EnhancedBrowserWindowOpenerConnector extends BrowserWindowOpenerConnector {
 
     private JavaScriptObject window;
-    private HandlerRegistration menuClickHandlerReg;
 
 
     @Override
-    public void onClick(ClickEvent event) {
+    public void trigger() {
         if (getState().clientSide) {
-            super.onClick(event);
+            super.trigger();
         } else if (getState().popupBlockerWorkaround) {
             window = openWindow(getState().target, getState().features);
         }
@@ -56,38 +50,11 @@ public class EnhancedBrowserWindowOpenerConnector extends BrowserWindowOpenerCon
     public void onUnregister() {
         window = null;
         super.onUnregister();
-        if (menuClickHandlerReg != null) {
-            menuClickHandlerReg.removeHandler();
-        }
-
-
     }
 
     @Override
     public EnhancedBrowserWindowOpenerState getState() {
         return (EnhancedBrowserWindowOpenerState) super.getState();
-    }
-
-    @Override
-    protected void extend(ServerConnector target) {
-        if (target instanceof MenuBarConnector) {
-            extendMenu((MenuBarConnector) target);
-        } else {
-            super.extend(target);
-        }
-    }
-
-
-    private void extendMenu(MenuBarConnector target) {
-        VMenuBar widget = target.getWidget();
-
-        menuClickHandlerReg = widget.addHandler(event -> {
-            VConsole.log("======================= menu clicked " + getState().menuItem + " item is "
-                + event.getMenuItem().getServerSideId());
-            if (event.getMenuItem().getServerSideId() == getState().menuItem) {
-                this.onClick(null);
-            }
-        }, ServerSideIdAwareMenuItem.MenuItemSelectedEvent.getType());
     }
 
     @OnStateChange("lastUpdated")
@@ -103,9 +70,8 @@ public class EnhancedBrowserWindowOpenerConnector extends BrowserWindowOpenerCon
                 }
                 window = null;
             } else {
-                super.onClick(null);
+                super.trigger();
             }
-
         }
     }
 
@@ -153,7 +119,6 @@ public class EnhancedBrowserWindowOpenerConnector extends BrowserWindowOpenerCon
   }-*/;
 
     private static native void wrapMenu(VMenuBar hostReference) /*-{
-    console.log("======================================== OK", hostReference);
     var clickFn = hostReference.onMenuClick;
     hostReference.onMenuClick = function(itemId) {
         console.log("My Fn invoked", itemId);

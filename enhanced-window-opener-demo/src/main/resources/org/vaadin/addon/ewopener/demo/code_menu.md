@@ -8,6 +8,6 @@ MenuBar.MenuItem subMenu = menuBar.addItem("Sub menu", null);
 MenuBar.MenuItem subItem = subMenu.addItem("Download (client side)", aCommandIfYouLike);
 MenuBar.MenuItem subItem2 = subMenu.addItem("Download (server side)", selectedItem -> openerWK.open());
 
-openerWK.doExtend(menuBar, subItem2);
-openerCS.doExtend(menuBar, subItem);
+openerWK.doExtend(subItem2);
+openerCS.doExtend(subItem);
 ```
