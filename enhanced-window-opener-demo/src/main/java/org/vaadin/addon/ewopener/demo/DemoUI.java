@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Marco Collovati (mcollovati@gmail.com)
+ * Copyright (C) 2016-2017 Marco Collovati (mcollovati@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Viewport;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.ShortcutAction;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Sizeable;
@@ -42,6 +44,7 @@ import com.vaadin.shared.ui.MultiSelectMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.MenuBar;
@@ -69,16 +72,37 @@ public class DemoUI extends UI {
     private final AtomicInteger downloadCounter = new AtomicInteger(0);
     private Table table;
 
+
+    private ShortcutListener createShortcutListener(Runnable action, int keyCode, int... modifiers) {
+        return new ShortcutListener("", keyCode, modifiers) {
+
+            @Override
+            public void handleAction(Object sender, Object target) {
+                action.run();
+            }
+        };
+    }
+
     @Override
     protected void init(VaadinRequest request) {
 
-        EnhancedBrowserWindowOpener opener1 = new EnhancedBrowserWindowOpener()
-            .popupBlockerWorkaround(true);
+
         Button button1 = new Button("Click me");
+        ShortcutListener shortcutListener = createShortcutListener(
+            () -> button1.click(),
+            ShortcutAction.KeyCode.NUM1, ShortcutAction.ModifierKey.CTRL, ShortcutAction.ModifierKey.ALT
+        );
+        getActionManager().addAction(shortcutListener);
+
+        EnhancedBrowserWindowOpener opener1 = new EnhancedBrowserWindowOpener()
+            .popupBlockerWorkaround(true)
+            .withShortcut(shortcutListener);
         button1.addClickListener(e -> {
             opener1.open(generateResource());
         });
         opener1.extend(button1);
+        Label shortcut1Label = new Label("Or press CTRL+ALT+1");
+
 
         EnhancedBrowserWindowOpener opener4 = new EnhancedBrowserWindowOpener()
             .popupBlockerWorkaround(true);
@@ -106,7 +130,9 @@ public class DemoUI extends UI {
         new EnhancedBrowserWindowOpener()
             .clientSide(true)
             .withGeneratedContent("myFileName.txt", this::generateContent)
+            .withShortcut(ShortcutAction.KeyCode.NUM2, ShortcutAction.ModifierKey.CTRL, ShortcutAction.ModifierKey.ALT)
             .doExtend(link);
+        Label shortcut2Label = new Label("Or press CTRL+ALT+2");
 
         Link link2 = new Link("Click me", null);
         new EnhancedBrowserWindowOpener()
@@ -125,6 +151,7 @@ public class DemoUI extends UI {
         CompletableFuture.runAsync(this::doSomeLongProcessing)
             .thenRun(() -> getUI().access(opener5::open));
 
+
         table = new Table("Select items to download", new BeanItemContainer<>(DummyService.Person.class, DummyService.data()));
         table.setImmediate(true);
         table.setVisibleColumns("name", "age");
@@ -134,7 +161,6 @@ public class DemoUI extends UI {
         table.setMultiSelectMode(MultiSelectMode.DEFAULT);
         table.setMultiSelect(true);
         table.setSelectable(true);
-
 
         final MyPopupContent popupContent = new MyPopupContent();
         Button popupButton = new Button("Open modal", event -> {
@@ -175,6 +201,26 @@ public class DemoUI extends UI {
         opener8.doExtend(menuBar, subItem);
 
 
+        Button button9 = new Button("Open another UI (client side)");
+        EnhancedBrowserWindowOpener opener9 = new EnhancedBrowserWindowOpener(AboutUI.class)
+            .clientSide(true)
+            .withShortcut(ShortcutAction.KeyCode.NUM3, ShortcutAction.ModifierKey.CTRL, ShortcutAction.ModifierKey.ALT)
+            .doExtend(button9);
+        Label shortcutLabel9 = new Label("Or press CTRL+ALT+3");
+
+        Button button10 = new Button("Open another UI (popup workaround)");
+        ShortcutListener shortcutListener2 = createShortcutListener(
+            () -> button10.click(),
+            ShortcutAction.KeyCode.NUM4, ShortcutAction.ModifierKey.CTRL, ShortcutAction.ModifierKey.ALT
+        );
+        getActionManager().addAction(shortcutListener2);
+        EnhancedBrowserWindowOpener opener10 = new EnhancedBrowserWindowOpener(AboutUI.class)
+            .popupBlockerWorkaround(true)
+            .withShortcut(shortcutListener2)
+            .doExtend(button10);
+        button10.addClickListener(ev -> opener10.open());
+        Label shortcutLabel10 = new Label("Or press CTRL+ALT+4");
+
         // Show it in the middle of the screen
         final Layout layout = new MVerticalLayout(
             new MLabel("Enhanced Window Opener Demo")
@@ -182,14 +228,14 @@ public class DemoUI extends UI {
             new MHorizontalLayout().add(table, 1).add(
                 new MCssLayout(
                     menuBar, readMarkdown("code_menu.md"),
-                    new MVerticalLayout(readMarkdown("code1.md"), button1)
+                    new MVerticalLayout(readMarkdown("code1.md"), button1, shortcut1Label)
                         .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined()
                         .withMargin(false),
                     new MVerticalLayout(readMarkdown("code2.md"), button2)
                         .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
                     new MVerticalLayout(readMarkdown("code7.md"), button3)
                         .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
-                    new MVerticalLayout(readMarkdown("code5.md"), link)
+                    new MVerticalLayout(readMarkdown("code5.md"), link, shortcut2Label)
                         .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
                     new MVerticalLayout(readMarkdown("code6.md"), link2)
                         .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
@@ -198,6 +244,10 @@ public class DemoUI extends UI {
                     new MVerticalLayout(readMarkdown("code8.md"), popupButton)
                         .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
                     new MVerticalLayout(readMarkdown("code4.md"), hiddenComponent)
+                        .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
+                    new MVerticalLayout(readMarkdown("code_ui_client.md"), button9, shortcutLabel9)
+                        .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false),
+                    new MVerticalLayout(readMarkdown("code_ui_popupblocker.md"), button10, shortcutLabel10)
                         .alignAll(Alignment.MIDDLE_CENTER).withWidthUndefined().withMargin(false)
                 ).withFullWidth().withStyleName("demo-samples")
                 , 5).withFullWidth()
