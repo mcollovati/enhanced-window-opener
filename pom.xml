@@ -4,7 +4,7 @@
     <groupId>org.vaadin.addon</groupId>
     <artifactId>enhanced-window-opener-root</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <name>Enhanced Window Opener Add-on Root Project</name>
 
     <prerequisites>
@@ -18,7 +18,7 @@
         <name>Marco Collovati</name>
         <url>https://github.com/mcollovati</url>
     </organization>
-    <inceptionYear>2016</inceptionYear>
+    <inceptionYear>2016-2018</inceptionYear>
     <issueManagement>
         <system>GitHub</system>
         <url>https://github.com/mcollovati/enhanced-window-opener/issues</url>

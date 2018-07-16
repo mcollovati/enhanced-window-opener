@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Marco Collovati (mcollovati@gmail.com)
+ * Copyright (C) 2016-2018 Marco Collovati (mcollovati@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.vaadin.addon.ewopener;
 import java.time.Instant;
 import java.util.Objects;
 
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.Resource;
@@ -139,6 +140,19 @@ public class EnhancedBrowserWindowOpener extends BrowserWindowOpener {
 
     public EnhancedBrowserWindowOpener popupBlockerWorkaround(boolean active) {
         getState().popupBlockerWorkaround = active;
+        return this;
+    }
+
+    public EnhancedBrowserWindowOpener withShortcut(int keyCode, int... modifiers) {
+        getState().shortcut = new EnhancedBrowserWindowOpenerState.Shortcut(keyCode, modifiers);
+        return this;
+    }
+    public EnhancedBrowserWindowOpener withShortcut(ShortcutListener shortcutListener) {
+        return withShortcut(shortcutListener.getKeyCode(), shortcutListener.getModifiers());
+    }
+
+    public EnhancedBrowserWindowOpener withoutShortcut() {
+        getState().shortcut = null;
         return this;
     }
 

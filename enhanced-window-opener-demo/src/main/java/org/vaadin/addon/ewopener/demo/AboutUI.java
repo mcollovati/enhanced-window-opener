@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.vaadin.addon.ewopener;
+package org.vaadin.addon.ewopener.demo;
 
-import com.vaadin.server.StreamResource;
+import com.vaadin.annotations.Theme;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.UI;
 
-@FunctionalInterface
-public interface StreamResourceCustomizer {
-    /**
-     * Allow to customize a StreamResource before download starts.
-     *
-     * @param resource the resource to customize
-     */
-    void customize(StreamResource resource);
+@Theme("demo")
+public class AboutUI extends UI {
+    @Override
+    protected void init(VaadinRequest request) {
+        setContent(new Label("EnhancedWindowOpener"));
+    }
 }

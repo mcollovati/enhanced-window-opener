@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Marco Collovati (mcollovati@gmail.com)
+ * Copyright (C) 2016-2018 Marco Collovati (mcollovati@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package org.vaadin.addon.ewopener.shared;
 
+import java.io.Serializable;
+import java.util.Arrays;
+
 import com.vaadin.shared.ui.BrowserWindowOpenerState;
 
 public class EnhancedBrowserWindowOpenerState extends BrowserWindowOpenerState {
@@ -26,4 +29,24 @@ public class EnhancedBrowserWindowOpenerState extends BrowserWindowOpenerState {
     public boolean popupBlockerWorkaround = false;
 
     public int menuItem = 0;
+    public Shortcut shortcut;
+
+    public static class Shortcut implements Serializable  {
+        public int keyCode;
+
+        public int[] modifiers;
+
+        public Shortcut() {
+        }
+
+        public Shortcut(int keyCode, int[] modifiers) {
+            this.keyCode = keyCode;
+            this.modifiers = modifiers;
+        }
+
+        @Override
+        public String toString() {
+            return "KeyCode: " + keyCode + " -  modifiers: [" + Arrays.toString(modifiers) + "]";
+        }
+    }
 }
